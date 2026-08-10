@@ -142,7 +142,7 @@ audio {
 <body>
 
 <div id="header">
-  <img src="Logo_hiphop.png" alt="Logo hip.hop" class="header-logo">
+  <img src="../baloes/Logo_hiphop.png" alt="Logo hip.hop" class="header-logo">
   <div class="header-text">
     <h2>Plataforma hip.hop - V. Alpha Teste</h2>
     <p>DYART - Business Intelligence</p>
@@ -199,9 +199,17 @@ function tratarLinkMidia(rawInput, tipoMidia) {
     const matchFormula = url.match(/"([^"]+)"/);
     if (matchFormula) url = matchFormula[1];
   }
-  if (tipoMidia === "audio" && (url.toLowerCase().endsWith('.mp3') || url.toLowerCase().endsWith('.wav') || url.toLowerCase().endsWith('.ogg'))) {
-    return url;
+  
+  if (tipoMidia === "audio") {
+    if (url.toLowerCase().endsWith('.mp3') || url.toLowerCase().endsWith('.wav') || url.toLowerCase().endsWith('.ogg')) {
+      // Se não for uma URL completa da web, adiciona o caminho da subpasta de áudios
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return '../audios/' + url;
+      }
+      return url;
+    }
   }
+  
   const match = url.match(/(?:\/d\/|id=)([a-zA-Z0-9-_]{33,45})/);
   if (match) {
     const id = match[1];
@@ -476,8 +484,8 @@ function plotarPinsNoMapa() {
   const limitesMapa = new google.maps.LatLngBounds();
 
   pontosHistoricos.forEach(ponto => {
-    // 🎨 Seleciona a imagem Balao_E.png ou Balao_U.png
-    const arquivoIcone = (ponto.balao === 'E') ? 'Balao_E.png' : 'Balao_U.png';
+    // 🎨 Seleciona a imagem Balao_E.png ou Balao_U.png no diretório correto
+    const arquivoIcone = (ponto.balao === 'E') ? '../baloes/Balao_E.png' : '../baloes/Balao_U.png';
 
     const iconeLogo = {
       url: arquivoIcone,
@@ -549,4 +557,3 @@ function plotarPinsNoMapa() {
 </script>
 </body>
 </html>
-
