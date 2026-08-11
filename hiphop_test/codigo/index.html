@@ -153,7 +153,7 @@ html, body {
   border-color: #1a365d;
 }
 
-/* Status de Carregamento e Diagnóstico */
+/* Status de Carregamento */
 #status-carregamento {
   font-size: 11px;
   font-weight: 600;
@@ -163,17 +163,6 @@ html, body {
   background: #edf2f7;
   flex-shrink: 0;
   line-height: 1.4;
-}
-#debug-box {
-  background: #fff5f5;
-  color: #c53030;
-  padding: 6px 10px;
-  font-size: 10px;
-  font-family: monospace;
-  border-bottom: 1px solid #feb2b2;
-  word-break: break-all;
-  max-height: 80px;
-  overflow-y: auto;
 }
 
 #map {
@@ -252,12 +241,11 @@ audio {
 <div id="filter-bar"></div>
 
 <div id="status-carregamento">🔄 Sincronizando dados com a planilha...</div>
-<div id="debug-box">🔍 Analisando colunas da planilha...</div>
 
 <div id="map"></div>
 
 <script>
-const LINK_DA_PLANILHA = 'https://docs.google.com/spreadsheets/d/1yYdM9HzJE_eCYr4zASUt2JQOZ_6McKI8uwieAtRIJms/edit?usp=sharing';
+const LINK_DA_PLANILHA = 'https://docs.google.com/spreadsheets/d/1o-zFjux3l5nkL83PsruG9ngLoEwPPe9NvEhd1kWRwPQ/edit?usp=sharing';
 
 let map;
 let pontosHistoricos = [];
@@ -381,30 +369,11 @@ async function carregarDadosPlanilha() {
   if (!spreadsheetId) return;
 
   try {
-    const urlGviz = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json`;
+    // Leitura limpa da primeira aba ativa sem filtro rígido de nome
+    const urlGviz = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?gid=0&tqx=out:json`;
     const resposta = await fetch(urlGviz);
     const textoCompleto = await resposta.text();
     const jsonPuro = JSON.parse(textoCompleto.substring(textoCompleto.indexOf('{'), textoCompleto.lastIndexOf('}') + 1));
-    
-    // Diagnóstico dos cabeçalhos da Planilha
-    const cols = jsonPuro.table.cols;
-    let debugText = "CABEÇALHOS DETECTADOS:<br>";
-    cols.forEach((col, idx) => {
-      let label = col ? (col.label || col.id) : `Col${idx}`;
-      debugText += `[${idx}]=${label} | `;
-    });
-    
-    // Pega a primeira linha de dados para checar valores
-    if (jsonPuro.table.rows.length > 0) {
-      const primeiraLinha = jsonPuro.table.rows[0].c;
-      debugText += "<br><strong>LINHA 1 EXEMPLO:</strong><br>";
-      primeiraLinha.forEach((cel, idx) => {
-        let v = cel ? (cel.v !== undefined ? cel.v : cel.f) : "";
-        debugText += `[${idx}]: "${String(v).substring(0, 15)}" | `;
-      });
-    }
-    document.getElementById("debug-box").innerHTML = debugText;
-
     const linhas = jsonPuro.table.rows;
 
     pontosHistoricos = [];
@@ -435,6 +404,7 @@ async function carregarDadosPlanilha() {
         let lngRaw = val(2).replace(',', '.').replace(/[^\d.-]/g, '');
         let tipoBalao = (val(3).toUpperCase() === "E") ? "E" : "U";
 
+        // Mapeamento Posicional Fixo das 13 Colunas
         let resumoPT = val(4);
         let audioPT = val(5);
         
