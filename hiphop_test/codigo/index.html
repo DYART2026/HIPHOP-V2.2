@@ -153,7 +153,7 @@ html, body {
   border-color: #1a365d;
 }
 
-/* Status de Carregamento */
+/* Status de Carregamento e Diagnóstico */
 #status-carregamento {
   font-size: 11px;
   font-weight: 600;
@@ -163,6 +163,17 @@ html, body {
   background: #edf2f7;
   flex-shrink: 0;
   line-height: 1.4;
+}
+#debug-box {
+  background: #fff5f5;
+  color: #c53030;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-family: monospace;
+  border-bottom: 1px solid #feb2b2;
+  word-break: break-all;
+  max-height: 80px;
+  overflow-y: auto;
 }
 
 #map {
@@ -200,7 +211,6 @@ audio {
 .tag-urbano { background-color: #2b6cb0; }
 .tag-categoria { background-color: #8e44ad; margin-left: 4px; }
 
-/* Bolinha do GPS */
 .user-location-marker {
   background-color: #4285F4;
   border: 3px solid #ffffff;
@@ -242,6 +252,7 @@ audio {
 <div id="filter-bar"></div>
 
 <div id="status-carregamento">🔄 Sincronizando dados com a planilha...</div>
+<div id="debug-box">🔍 Analisando colunas da planilha...</div>
 
 <div id="map"></div>
 
@@ -342,7 +353,6 @@ function formatarLinkImagemDrive(url) {
   if (!url || url.trim() === "") return "";
   let link = url.trim();
 
-  // Se for ID puro ou link do Google Drive
   let match = link.match(/\/d\/([a-zA-Z0-9-_]+)/) || link.match(/id=([a-zA-Z0-9-_]+)/);
   if (match && match[1]) {
     return `https://lh3.googleusercontent.com/d/${match[1]}`;
@@ -375,6 +385,26 @@ async function carregarDadosPlanilha() {
     const resposta = await fetch(urlGviz);
     const textoCompleto = await resposta.text();
     const jsonPuro = JSON.parse(textoCompleto.substring(textoCompleto.indexOf('{'), textoCompleto.lastIndexOf('}') + 1));
+    
+    // Diagnóstico dos cabeçalhos da Planilha
+    const cols = jsonPuro.table.cols;
+    let debugText = "CABEÇALHOS DETECTADOS:<br>";
+    cols.forEach((col, idx) => {
+      let label = col ? (col.label || col.id) : `Col${idx}`;
+      debugText += `[${idx}]=${label} | `;
+    });
+    
+    // Pega a primeira linha de dados para checar valores
+    if (jsonPuro.table.rows.length > 0) {
+      const primeiraLinha = jsonPuro.table.rows[0].c;
+      debugText += "<br><strong>LINHA 1 EXEMPLO:</strong><br>";
+      primeiraLinha.forEach((cel, idx) => {
+        let v = cel ? (cel.v !== undefined ? cel.v : cel.f) : "";
+        debugText += `[${idx}]: "${String(v).substring(0, 15)}" | `;
+      });
+    }
+    document.getElementById("debug-box").innerHTML = debugText;
+
     const linhas = jsonPuro.table.rows;
 
     pontosHistoricos = [];
@@ -405,7 +435,6 @@ async function carregarDadosPlanilha() {
         let lngRaw = val(2).replace(',', '.').replace(/[^\d.-]/g, '');
         let tipoBalao = (val(3).toUpperCase() === "E") ? "E" : "U";
 
-        // Mapeamento Posicional Fixo das 13 Colunas
         let resumoPT = val(4);
         let audioPT = val(5);
         
@@ -654,7 +683,6 @@ function plotarPinsNoMapa() {
 
     const pinElement = L.marker(posPonto, { icon: iconeCustom }).addTo(map);
 
-    // Seleção Dinâmica do Idioma com fallback inteligente
     const textoResumo = ponto.resumo[idiomaAtual] || ponto.resumo['PT'] || '';
     const arquivoAudioNome = ponto.audioArquivo[idiomaAtual] || ponto.audioArquivo['PT'] || '';
     const urlAudioEfetiva = resolverCaminhoAudio(arquivoAudioNome, idiomaAtual);
