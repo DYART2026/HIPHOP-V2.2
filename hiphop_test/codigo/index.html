@@ -330,6 +330,11 @@ function resolverCaminhoAudio(nomeArquivo, lang) {
     return arquivo;
   }
 
+  // Garantia automática de extensão .mp3 no final
+  if (!arquivo.toLowerCase().endsWith('.mp3')) {
+    arquivo += '.mp3';
+  }
+
   let pasta = "../audios/";
   if (lang === "EN") pasta = "../audios_EN/";
   if (lang === "ES") pasta = "../audios_ES/";
@@ -369,7 +374,6 @@ async function carregarDadosPlanilha() {
   if (!spreadsheetId) return;
 
   try {
-    // Leitura limpa da primeira aba ativa sem filtro rígido de nome
     const urlGviz = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?gid=0&tqx=out:json`;
     const resposta = await fetch(urlGviz);
     const textoCompleto = await resposta.text();
@@ -404,7 +408,6 @@ async function carregarDadosPlanilha() {
         let lngRaw = val(2).replace(',', '.').replace(/[^\d.-]/g, '');
         let tipoBalao = (val(3).toUpperCase() === "E") ? "E" : "U";
 
-        // Mapeamento Posicional Fixo das 13 Colunas
         let resumoPT = val(4);
         let audioPT = val(5);
         
