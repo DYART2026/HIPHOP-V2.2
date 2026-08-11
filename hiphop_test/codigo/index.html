@@ -326,11 +326,12 @@ function resolverCaminhoAudio(nomeArquivo, lang) {
   if (!nomeArquivo || nomeArquivo.trim() === "") return "";
   let arquivo = nomeArquivo.trim();
 
+  // Se já for uma URL completa HTTP/HTTPS
   if (arquivo.startsWith('http://') || arquivo.startsWith('https://')) {
     return arquivo;
   }
 
-  // Garantia automática de extensão .mp3 no final
+  // Se não tiver extensão .mp3, adiciona automaticamente
   if (!arquivo.toLowerCase().endsWith('.mp3')) {
     arquivo += '.mp3';
   }
