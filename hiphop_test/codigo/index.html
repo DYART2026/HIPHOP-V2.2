@@ -326,12 +326,10 @@ function resolverCaminhoAudio(nomeArquivo, lang) {
   if (!nomeArquivo || nomeArquivo.trim() === "") return "";
   let arquivo = nomeArquivo.trim();
 
-  // Se já for uma URL completa HTTP/HTTPS
   if (arquivo.startsWith('http://') || arquivo.startsWith('https://')) {
     return arquivo;
   }
 
-  // Se não tiver extensão .mp3, adiciona automaticamente
   if (!arquivo.toLowerCase().endsWith('.mp3')) {
     arquivo += '.mp3';
   }
@@ -569,6 +567,7 @@ function verificarProximidadeEPlay(posUsuario) {
         const idAudio = `audio-ponto-${pontoEncontradoNoRaio.ponto.id}`;
         const elementoAudio = document.getElementById(idAudio);
         if (elementoAudio) {
+          elementoAudio.load();
           elementoAudio.play().catch(e => console.warn("Bloqueio de autoplay:", e));
 
           if (typeof gtag === 'function') {
@@ -681,8 +680,7 @@ function plotarPinsNoMapa() {
     if (urlAudioEfetiva) {
       conteudoModal += '<div style="margin-top:6px;">' +
         '<label style="font-size:11px; font-weight:bold; color:#1a365d;">' + t.ouvirHistoria + '</label>' +
-        '<audio id="' + idAudioTag + '" controls preload="none" style="width:100%; margin-top:4px;">' +
-        '<source src="' + urlAudioEfetiva + '" type="audio/mpeg">' +
+        '<audio id="' + idAudioTag + '" controls preload="metadata" src="' + urlAudioEfetiva + '" style="width:100%; margin-top:4px;">' +
         'Seu navegador não suporta o elemento de áudio.' +
         '</audio>' +
         '</div>';
