@@ -389,15 +389,16 @@ async function carregarDadosPlanilha() {
         let tipoBalaoRaw = String(extrairValor(linha.c[3])).trim().toUpperCase();
         let tipoBalao = (tipoBalaoRaw === "E") ? "E" : "U";
 
-        // Mapeamento das 13 Colunas (A até M)
+        // Mapeamento Rigoroso das 13 Colunas (A=0 até M=12)
         let resumoPT = String(extrairValor(linha.c[4])).trim();
         let audioPT = String(extrairValor(linha.c[5])).trim();
         
         let raioPredefinido = parseInt(extrairValor(linha.c[6]));
         let raioEfetivo = isNaN(raioPredefinido) ? (tipoBalao === "E" ? 150 : 25) : raioPredefinido;
         
+        // Coluna H = Índice 7 (Categoria)
         let categoria = String(extrairValor(linha.c[7])).trim() || "Geral";
-        if (categoria) categoriasSet.add(categoria);
+        if (categoria && categoria !== "Geral") categoriasSet.add(categoria);
 
         let linkFoto = String(extrairValor(linha.c[8])).trim();
         
@@ -447,7 +448,7 @@ function gerarBotoesFiltro(listaCategorias) {
   let html = `<button class="btn-filter active" onclick="filtrarCategoria('TODAS', this)">${t.todasCategorias}</button>`;
   
   listaCategorias.forEach(cat => {
-    html += `<button class="btn-filter" onclick="filtrarCategoria('${cat}', this)">📌 ${cat}</button>`;
+    html += `<button class="btn-filter" onclick="filtrarCategoria('${cat}', this)">${cat}</button>`;
   });
   
   container.innerHTML = html;
@@ -634,7 +635,7 @@ function plotarPinsNoMapa() {
 
     const pinElement = L.marker(posPonto, { icon: iconeCustom }).addTo(map);
 
-    // Seleciona o texto e o áudio com base no idioma atual (com fallback em Português)
+    // Seleciona o texto e o áudio com base no idioma atual
     const textoResumo = ponto.resumo[idiomaAtual] || ponto.resumo['PT'] || '';
     const arquivoAudioNome = ponto.audioArquivo[idiomaAtual] || ponto.audioArquivo['PT'] || '';
     const urlAudioEfetiva = resolverCaminhoAudio(arquivoAudioNome, idiomaAtual);
