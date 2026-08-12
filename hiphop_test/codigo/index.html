@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Plataforma hip.hop - Engine Multilíngue</title>
+<title>Plataforma hip.hop - Engine Multilíngue (Diagnóstico)</title>
 
 <!-- 📊 Google Analytics 4 (GA4) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-8YBRS5NX34"></script>
@@ -213,6 +213,19 @@ audio {
   border-radius: 6px;
   margin-bottom: 6px;
   display: block;
+}
+
+/* Caixinha Amarela de Teste/Diagnóstico */
+.box-diagnostico {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 6px;
+  font-size: 10px;
+  border-radius: 4px;
+  margin-top: 6px;
+  word-break: break-all;
+  font-family: monospace;
 }
 </style>
 </head>
@@ -685,6 +698,14 @@ function plotarPinsNoMapa() {
         '</audio>' +
         '</div>';
     }
+
+    // 🔍 CAIXINHA DE DIAGNÓSTICO: Mostra na tela a rota que foi montada
+    conteudoModal += '<div class="box-diagnostico">' +
+      '<strong>🔍 Diagnóstico [' + idiomaAtual + ']:</strong><br>' +
+      'Lido na planilha: ' + (arquivoAudioNome || "VAZIO") + '<br>' +
+      'Caminho final: ' + (urlAudioEfetiva || "NENHUM") +
+      '</div>';
+
     conteudoModal += '</div>';
 
     pinElement.bindPopup(conteudoModal);
